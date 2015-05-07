@@ -32,6 +32,26 @@ type SecureCopier struct {
 	dstUser string
 	dstFile string
 }
+
+func NewSecureCopier(port int, isRecursive, isRemoteTo, isRemoteFrom, isQuiet, isVerbose, isCheckKnownHosts bool, keyFile, srcHost, srcUser, srcFile, dstHost, dstUser, dstFile string) *SecureCopier {
+	return &SecureCopier{
+		Port: port,
+		IsRecursive: isRecursive,
+		IsRemoteTo: isRemoteTo,
+		IsRemoteFrom: isRemoteFrom,
+		IsQuiet: isQuiet,
+		IsVerbose: isVerbose,
+		IsCheckKnownHosts: isCheckKnownHosts,
+		KeyFile: keyFile,
+		srcHost: srcHost,
+		srcUser: srcUser,
+		srcFile: srcFile,
+		dstHost: dstHost,
+		dstUser: dstUser,
+		dstFile: dstFile,
+	}
+}
+
 func (scp *SecureCopier) Name() string {
 	return "scp"
 }

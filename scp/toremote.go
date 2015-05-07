@@ -181,7 +181,7 @@ func (scp *SecureCopier) scpToRemote(srcFile, dstUser, dstHost, dstFile string, 
 	if scp.IsRecursive {
 		remoteOpts += "r"
 	}
-	err = session.Run("/usr/bin/scp " + remoteOpts + " " + dstFile)
+	err = session.Run("/bin/mkdir -p " + dstFile + " && /usr/bin/scp " + remoteOpts + " " + dstFile)
 	if err != nil {
 		fmt.Fprintln(errPipe, "Failed to run remote scp: "+err.Error())
 	}
