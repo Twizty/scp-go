@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"bytes"
 )
 
 const (
@@ -94,11 +95,11 @@ func (scp *SecureCopier) ParseFlags(call []string, errPipe io.Writer) (error, in
 	return nil, 0
 }
 
-func (scp *SecureCopier) Exec(inPipe io.Reader, outPipe io.Writer, errPipe io.Writer) (error, int) {
+func (scp *SecureCopier) Exec(inPipe io.Reader, outPipe io.Writer, errPipe io.Writer, result *bytes.Buffer) (error, int) {
 	if scp.srcHost != "" && scp.dstHost != "" {
 		return errors.New("remote->remote NOT implemented (yet)!"), 1
 	} else if scp.srcHost != "" {
-		err := scp.scpFromRemote(scp.srcUser, scp.srcHost, scp.srcFile, scp.dstFile, inPipe, outPipe, errPipe)
+		err := scp.scpFromRemote(scp.srcUser, scp.srcHost, scp.srcFile, scp.dstFile, inPipe, outPipe, errPipe, result)
 		if err != nil {
 			fmt.Fprintln(errPipe, errPipe, "Failed to run 'from-remote' scp: "+err.Error())
 			return err, 1
@@ -183,7 +184,7 @@ func ScpCli(args []string) (error, int) {
 	if err != nil {
 		return err, status
 	}
-	err, status = scper.Exec(os.Stdin, os.Stdout, os.Stderr)
+	err, status = scper.Exec(os.Stdin, os.Stdout, os.Stderr, &bytes.Buffer{})
 	return err, status
 
 

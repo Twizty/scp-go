@@ -12,10 +12,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"bytes"
 )
 
 // scp FROM remote source
-func (scp *SecureCopier) scpFromRemote(srcUser, srcHost, srcFile, dstFile string, inPipe io.Reader, outPipe io.Writer, errPipe io.Writer) error {
+func (scp *SecureCopier) scpFromRemote(srcUser, srcHost, srcFile, dstFile string, inPipe io.Reader, outPipe io.Writer, errPipe io.Writer, output *bytes.Buffer) error {
 	dstFileInfo, err := os.Stat(dstFile)
 	dstDir := dstFile
 	var useSpecifiedFilename bool
@@ -200,13 +201,15 @@ func (scp *SecureCopier) scpFromRemote(srcUser, srcHost, srcFile, dstFile string
 						pb.Update(0)
 
 						//TODO: mode here
-						fw, err := os.Create(thisDstFile)
-						if err != nil {
-							ce <- err
-							fmt.Fprintln(errPipe, "File creation error: "+err.Error())
-							return
-						}
-						defer fw.Close()
+						// fw, err := os.Create(thisDstFile)
+						// if err != nil {
+						// 	ce <- err
+						// 	fmt.Fprintln(errPipe, "File creation error: "+err.Error())
+						// 	return
+						// }
+						// defer fw.Close()
+
+						fw := output
 
 						//buffered by 4096 bytes
 						bufferSize := int64(4096)
@@ -237,12 +240,12 @@ func (scp *SecureCopier) scpFromRemote(srcUser, srcHost, srcFile, dstFile string
 							lastPercent = percent
 						}
 						//close file writer & check error
-						err = fw.Close()
-						if err != nil {
-							fmt.Fprintln(errPipe, err.Error())
-							ce <- err
-							return
-						}
+						// err = fw.Close()
+						// if err != nil {
+						// 	fmt.Fprintln(errPipe, err.Error())
+						// 	ce <- err
+						// 	return
+						// }
 						//get next byte from channel reader
 						nb := make([]byte, 1)
 						_, err = r.Read(nb)
